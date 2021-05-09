@@ -92,8 +92,9 @@ const ImageListScreen = () => {
                 //console.log("data",latitude,longitude,"ha")
                 fetch(`http://api.positionstack.com/v1/reverse?access_key=3d0ba2096a738608e82cb6386e055b76&query=${latitude},${longitude}`)
                 .then(response => response.json())
-                .then(data=>{
-                    console.log(data,"d")
+                .then(({data})=>{
+                    // const updatedData = data.toString()
+                    console.log(data.toString(),"h")
                 })
                 .catch(err=>{
                     console.log(err,"err")
