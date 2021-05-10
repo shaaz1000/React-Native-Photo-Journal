@@ -5,7 +5,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage"
 import Geolocation from 'react-native-geolocation-service';
 import Geocoder from 'react-native-geocoding';
 const ImageListScreen = () => {
-    const ApiKey = "231213c0d7704509a64210440210905"
+    
     
     const [PermissionGranted,setisPermissionGranted] = useState(false)
     const Data = [
@@ -94,15 +94,25 @@ const ImageListScreen = () => {
                 .then(response => response.json())
                 .then(({data})=>{
                     // const updatedData = data.toString()
-                    console.log(data.toString(),"h")
+                    const convertArraytoObject = Object.assign({},data)
+                    console.log(convertArraytoObject["0"].region_code,"hii")
+                    fetch(`http://api.weatherapi.com/v1/current.json?key=231213c0d7704509a64210440210905&q=Thane,%20MH,%20India`)
+                    .then(weatherResponse=>weatherResponse.json())
+                    .then(({current})=>{
+                        const {feelslike_c} = current
+                        console.log(feelslike_c,"from weather")
+                    })
+                    .catch(err=>{
+                        alert("Failed to load weather data")
+                    })
                 })
                 .catch(err=>{
-                    console.log(err,"err")
+                    alert("Failed to load address")
                 })
             },
             (error) => {
               // See error code charts below.
-              console.log(error.code, error.message);
+              alert("Something went wrong while accessing location")
             },
             { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
             )

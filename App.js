@@ -8,7 +8,7 @@ import ImageListScreen from "./source/screen/ImageListScreen"
 import InfoScreen from "./source/screen/InfoScreen"
 import ImageInformationScreen from "./source/screen/ImageInformationScreen"
 import ViewImageScreen from "./source/screen/ViewImageScreen"
-
+import ConfirmImageScreen from "./source/screen/ConfirmImageScreen"
 const Tab = createBottomTabNavigator()
 const Stack = createStackNavigator()
 
@@ -100,6 +100,7 @@ const App = () => {
         <Stack.Screen name="Main" component={bottomTabsScreen} options={{headerShown:false}}/>
         <Stack.Screen name="Image Information" component={ImageInformationScreen}/>
         <Stack.Screen name="View Image" component={ViewImageScreen}/>
+        <Stack.Screen name="Confirm Image" component={ConfirmImageScreen} options={{headerShown:false}}/>
       </Stack.Navigator>
     </NavigationContainer>
   )

@@ -7,7 +7,7 @@ import ImagePicker from "react-native-image-crop-picker"
 const {width,height} = Dimensions.get("window").width
 
 
-const ImageClickScreen = () => {
+const ImageClickScreen = ({navigation}) => {
     const [isImageCaptured,setImageCaptured] = useState(true)
     const captureImage = () => {
         ImagePicker.openCamera({
@@ -15,7 +15,8 @@ const ImageClickScreen = () => {
             height,
             cropping: true,
           }).then(image => {
-            console.log(image);
+           
+            navigation.navigate("Confirm Image",{image})
           }).catch((error) => {
               alert(error.toString());
               setImageCaptured(false);
