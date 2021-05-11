@@ -3,24 +3,14 @@ import {Text,View,StyleSheet, StatusBar,FlatList, SafeAreaView, ImageBackground,
 import { Appbar } from 'react-native-paper';
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import Geolocation from 'react-native-geolocation-service';
-// import Geocoder from 'react-native-geocoding';
-import { useFocusEffect } from '@react-navigation/native';
-const ImageListScreen = () => {
+import * as ImageActions from "../redux/action/dataInformationAction"
+import {connect} from "react-redux"
+const ImageListScreen = ({dispatch}) => {
     
     const [isDataEmpty,setIsDataEmpty] = useState(false)
-    
-    
+    const [Data,setData] = useState([])
     let Data1 = []
-    
-    //  Data1.push({
-    //     imageDate : "26th Jan 2021",
-    //     imageLocation : "Ahmednagar",
-    //     temperature :"24'☼",
-    //     imageLink : "https://media.nomadicmatt.com/netherlandsguide.jpg"
-    // })
 
-    
-    
     const saveData = async () => {
         
         try {
@@ -53,94 +43,19 @@ const ImageListScreen = () => {
             if(parseSavedData.length == 0){
                 setIsDataEmpty(true)
             }
-            // else{
-           
-            // let newData = JSON.parse(SavedData)
+            else{
+                setData(parseSavedData)
+            }
             
-            // newData.push({
-            //     imageDate : "28th Jan 2020",
-            //     imageLocation : "Ahmedae",
-            //     temperature :"25'☼",
-            //     imageLink : "uuuu"
-            // })
-            
-            
-            // //await AsyncStorage.removeItem("savedData")
-            // await AsyncStorage.setItem("savedData",JSON.stringify(newData))
-            // const data = await AsyncStorage.getItem("savedData")
-            // console.log(data,"d") 
-            // }
         } catch (error) {
             console.log(error,"line 41")
         }
-        console.log("44")
+       
        
     }
     
     
-    const Data = [
-        {
-            imageDate : "26th Jan 2021",
-            imageLocation : "Ahmednagar",
-            temperature :"24'☼",
-            imageLink : "https://media.nomadicmatt.com/netherlandsguide.jpg"
-        },
-        {
-            imageDate : "26th Jan 2021",
-            imageLocation : "Ahmednagar",
-            temperature :"24'☼",
-            imageLink : "https://media.nomadicmatt.com/netherlandsguide.jpg"
-        },
-        {
-            imageDate : "26th Jan 2021",
-            imageLocation : "Ahmednagar",
-            temperature :"24'☼",
-            imageLink : "https://media.nomadicmatt.com/netherlandsguide.jpg"
-        },
-        {
-            imageDate : "26th Jan 2021",
-            imageLocation : "Ahmednagar",
-            temperature :"24'☼",
-            imageLink : "https://media.nomadicmatt.com/netherlandsguide.jpg"
-        },
-        {
-            imageDate : "26th Jan 2021",
-            imageLocation : "Ahmednagar",
-            temperature :"24'☼",
-            imageLink : "https://media.nomadicmatt.com/netherlandsguide.jpg"
-        },
-        {
-            imageDate : "26th Jan 2021",
-            imageLocation : "Ahmednagar",
-            temperature :"24'☼",
-            imageLink : "https://media.nomadicmatt.com/netherlandsguide.jpg"
-        },
-        {
-            imageDate : "26th Jan 2021",
-            imageLocation : "Ahmednagar",
-            temperature :"24'☼",
-            imageLink : "https://media.nomadicmatt.com/netherlandsguide.jpg"
-        },
-        {
-            imageDate : "26th Jan 2021",
-            imageLocation : "Ahmednagar",
-            temperature :"24'☼",
-            imageLink : "https://media.nomadicmatt.com/netherlandsguide.jpg"
-        },
-        {
-            imageDate : "26th Jan 2021",
-            imageLocation : "Ahmednagar",
-            temperature :"24'☼",
-            imageLink : "https://media.nomadicmatt.com/netherlandsguide.jpg"
-        },
-        {
-            imageDate : "26th Jan 2021",
-            imageLocation : "Ahmednagar",
-            temperature :"24'☼",
-            imageLink : "https://media.nomadicmatt.com/netherlandsguide.jpg"
-        },
-    ]
-
+    
     
 
     const askForLocationPermission = async () => {
@@ -153,14 +68,15 @@ const ImageListScreen = () => {
                 fetch(`http://api.positionstack.com/v1/reverse?access_key=3d0ba2096a738608e82cb6386e055b76&query=${latitude},${longitude}`)
                 .then(response => response.json())
                 .then(({data})=>{
-                    // const updatedData = data.toString()
+                
                     const convertArraytoObject = Object.assign({},data)
-                    console.log(convertArraytoObject["0"].label,"hii")
+                    
+                    dispatch(ImageActions.LocationInfo(convertArraytoObject["0"].label))
                     fetch(`http://api.weatherapi.com/v1/current.json?key=231213c0d7704509a64210440210905&q=Thane,%20MH,%20India`)
                     .then(weatherResponse=>weatherResponse.json())
                     .then(({current})=>{
                         const {feelslike_c} = current
-                        //console.log(feelslike_c,"from weather")
+                            dispatch(ImageActions.ClimateInfo(feelslike_c))
                     })
                     .catch(err=>{
                         alert("Failed to load weather data")
@@ -195,15 +111,16 @@ const ImageListScreen = () => {
         
         askForLocationPermission()
     
-    },[Data])
+    },[])
     const renderItem = (item,index) => {
         const newDate = item.imageDate.split(" ")
+        
         //console.log(newDate.pop(),"hi")
         return(
             <>
                 <View>
                     <ImageBackground 
-                        source={require("../assets/image/pic.jpg")} 
+                        source={{uri:item.imageLink}} 
                         style={{width:"100%",height:200,elevation:10}}>
                         <Text style={{color:"white",fontSize:18,fontWeight:"bold",marginLeft:10}}>{newDate[1]}</Text>
                         <Text style={{color:"white",fontSize:18,fontWeight:"bold",marginLeft:10}}>{newDate[0]}</Text>
@@ -254,4 +171,4 @@ const ImageListScreen = () => {
     )
 }
 
-export default ImageListScreen;
+export default connect()(ImageListScreen);

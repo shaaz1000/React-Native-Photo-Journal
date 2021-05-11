@@ -1,7 +1,8 @@
-import React from "react";
+import React,{useState,useEffect} from "react";
 import {Text,View,StyleSheet, StatusBar,FlatList, SafeAreaView, ImageBackground, Image} from "react-native"
 import { Appbar ,Divider} from 'react-native-paper';
-
+import AsyncStorage from "@react-native-async-storage/async-storage"
+import moment from "moment"
 const InfoTextScreen = ({topText,middleText,bottomText}) => {
     return(
         <>
@@ -16,6 +17,35 @@ const InfoTextScreen = ({topText,middleText,bottomText}) => {
     )
 }
 const InfoScreen = () => {
+    const [isDataEmpty,setIsDataEmpty] = useState(false)
+    const [TotalDays,setTotalDays] = useState()
+    const [DifferenceOfDays,setDifferenceOfDays] = useState()
+    const date = moment().format('D MMMM YYYY')
+    
+    
+    const getNumberOfDays = async () => {
+        try {
+            const savedData = await AsyncStorage.getItem("savedData")
+            const newData = JSON.parse(savedData)
+            if(newData.length == 0){
+                setIsDataEmpty(true)
+                
+            }
+            else{
+                const totalClickedDays = moment().diff(newData[0].imageDate,"day")
+                setDifferenceOfDays(totalClickedDays)
+                setTotalDays(newData.length)
+                
+            }
+            
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    useEffect(()=>{
+        getNumberOfDays()
+    },[])
     return(
         <>
         <StatusBar backgroundColor="white" barStyle="dark-content"/>
@@ -29,11 +59,29 @@ const InfoScreen = () => {
                 </Text>
             }  titleStyle={{alignSelf:"center"}}/>
         </Appbar.Header>
-        <InfoTextScreen 
+        {
+            isDataEmpty ?
+            <View style={{flex:1,justifyContent:"center",alignSelf:"center"}}>
+                <Text style={{textAlign:"center",fontSize:18,fontWeight:"bold",marginHorizontal:10,backgroundColor:"#c6ffc1",padding:10,borderRadius:20}}>You haven't clicked any picture yet</Text>
+            </View>
+            :
+            <>
+            {
+                DifferenceOfDays === 0 ?
+                
+                <InfoTextScreen 
             topText="Days" 
-            middleText="17/19" 
-            bottomText="You have record 17 days since the first day"
-        />
+            middleText={`${TotalDays}`}
+            bottomText={`You have record ${TotalDays} days since the first day`}/>
+            :
+            <InfoTextScreen 
+            topText="Days" 
+            middleText={`${DifferenceOfDays}/${TotalDays}`}
+            bottomText={`You have record ${TotalDays} days since the first day`}
+            />
+            }
+            
+        
         <InfoTextScreen 
             topText="Hottest day" 
             middleText="39°" 
@@ -44,6 +92,9 @@ const InfoScreen = () => {
             middleText="24°" 
             bottomText="You have record 17 days since the first day"
         />
+        </>
+        }
+        
         </>
     )
 }
