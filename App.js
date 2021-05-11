@@ -11,6 +11,7 @@ import ViewImageScreen from "./source/screen/ViewImageScreen"
 import ConfirmImageScreen from "./source/screen/ConfirmImageScreen"
 import {Provider} from "react-redux"
 import store from "./source/redux/store"
+import SplashScreen from './source/screen/SplashScreen';
 
 const Tab = createBottomTabNavigator()
 const Stack = createStackNavigator()
@@ -101,9 +102,10 @@ const App = () => {
     <Provider store={store}>
     <NavigationContainer>
       <Stack.Navigator>
+        <Stack.Screen name="Splash Screen" component={SplashScreen} options={{headerShown:false}}/>
         <Stack.Screen name="Main" component={bottomTabsScreen} options={{headerShown:false}}/>
-        <Stack.Screen name="Image Information" component={ImageInformationScreen}/>
-        <Stack.Screen name="View Image" component={ViewImageScreen}/>
+        <Stack.Screen name="Image Information" component={ImageInformationScreen} options={{headerShown:false}}/>
+        <Stack.Screen name="View Image" component={ViewImageScreen} options={{headerShown:false}}/>
         <Stack.Screen name="Confirm Image" component={ConfirmImageScreen} options={{headerShown:false}}/>
       </Stack.Navigator>
     </NavigationContainer>

@@ -3,6 +3,7 @@ import {Text,View,StyleSheet, StatusBar,FlatList, SafeAreaView, ImageBackground,
 import { Appbar ,Divider} from 'react-native-paper';
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import moment from "moment"
+import { useFocusEffect } from '@react-navigation/native';
 const InfoTextScreen = ({topText,middleText,bottomText}) => {
     return(
         <>
@@ -20,8 +21,8 @@ const InfoScreen = () => {
     const [isDataEmpty,setIsDataEmpty] = useState(false)
     const [TotalDays,setTotalDays] = useState()
     const [DifferenceOfDays,setDifferenceOfDays] = useState()
-    const date = moment().format('D MMMM YYYY')
-    
+    const [coldestTemperature,setColdestTemperature] = useState([])
+    const [hottestTemperature,setHottestTemperature] = useState([])
     
     const getNumberOfDays = async () => {
         try {
@@ -35,6 +36,16 @@ const InfoScreen = () => {
                 const totalClickedDays = moment().diff(newData[0].imageDate,"day")
                 setDifferenceOfDays(totalClickedDays)
                 setTotalDays(newData.length)
+                const ColdestTemperature = newData.sort((a,b)=>{
+                    return a.temperature - b.temperature
+                })
+                setColdestTemperature(ColdestTemperature[0])
+                const HottestTemperature = newData.sort((a,b)=>{
+                    return b.temperature - a.temperature
+                    
+                })
+                setHottestTemperature(HottestTemperature[0])
+                
                 
             }
             
@@ -43,6 +54,7 @@ const InfoScreen = () => {
         }
     }
 
+    
     useEffect(()=>{
         getNumberOfDays()
     },[])
@@ -72,11 +84,11 @@ const InfoScreen = () => {
                 <InfoTextScreen 
             topText="Days" 
             middleText={`${TotalDays}`}
-            bottomText={`You have record ${TotalDays} days since the first day`}/>
+            bottomText={`You have record ${TotalDays} day since the first day`}/>
             :
             <InfoTextScreen 
             topText="Days" 
-            middleText={`${DifferenceOfDays}/${TotalDays}`}
+            middleText={`${TotalDays}/${DifferenceOfDays}`}
             bottomText={`You have record ${TotalDays} days since the first day`}
             />
             }
@@ -84,13 +96,13 @@ const InfoScreen = () => {
         
         <InfoTextScreen 
             topText="Hottest day" 
-            middleText="39°" 
-            bottomText="You have record 17 days since the first day"
+            middleText={`${hottestTemperature.temperature} '`} 
+            bottomText={`${hottestTemperature.imageDate}`}
         />
         <InfoTextScreen 
             topText="Coldest day" 
-            middleText="24°" 
-            bottomText="You have record 17 days since the first day"
+            middleText={`${coldestTemperature.temperature} '`} 
+            bottomText={`${coldestTemperature.imageDate}`}
         />
         </>
         }

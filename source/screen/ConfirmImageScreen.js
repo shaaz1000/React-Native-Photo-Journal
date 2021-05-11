@@ -2,11 +2,13 @@ import React,{useState,useEffect} from "react";
 import {Text,View,TextInput, StatusBar, SafeAreaView, ImageBackground,TouchableOpacity,Image,TouchableWithoutFeedback,Keyboard, KeyboardAvoidingView} from "react-native"
 import { Appbar ,IconButton} from 'react-native-paper';
 import moment from "moment"
+import Loader from "../commonComponent/Loader"
 import {connect} from "react-redux"
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import AsyncStorage from "@react-native-async-storage/async-storage"
+
 const ConfirmImageScreen = ({route,navigation,imageLocation,Climate}) => {
-    
+    const [Loading,setLoading] = useState(false)
     const {params} = route
     const [Thoughts,setThoughts] = useState("")
     const {image} = route.params
@@ -22,6 +24,7 @@ const ConfirmImageScreen = ({route,navigation,imageLocation,Climate}) => {
 
             if(newData.length != 0){
                 setSavedImageDate(newData[newData.length-1].imageDate)
+                
             }
 
         } catch (error) {
@@ -32,6 +35,7 @@ const ConfirmImageScreen = ({route,navigation,imageLocation,Climate}) => {
         checkData()
     },[])
     const uploadData = () => {
+        setLoading(true)
         let cloudData = {
             uri : path,
             type : mime,
@@ -54,10 +58,12 @@ const ConfirmImageScreen = ({route,navigation,imageLocation,Climate}) => {
             newData.push({
                 imageDate : date,
                 imageLocation,
-                temperature : `${Climate}'☼`, //"24'☼"
-                imageLink : url
+                temperature : Climate, //"24'☼"
+                imageLink : url,
+                Thoughts
             })
             await AsyncStorage.setItem("savedData",JSON.stringify(newData))
+            setLoading(false)
             navigation.navigate("Image List")
         }
         )
@@ -66,13 +72,13 @@ const ConfirmImageScreen = ({route,navigation,imageLocation,Climate}) => {
         })
     
     }
-    console.log( savedImageDate != newDate.toString(),"ji")
+    
     return(
         <>
         <StatusBar backgroundColor="white" barStyle="dark-content"/>
-        
+        <Loader loading={Loading}/>
         <Appbar.Header style={{backgroundColor:"white",height:50}}>
-        <Appbar.Action icon="chevron-left" onPress={() => {}} style={{right:10}} />
+        <Appbar.Action icon="chevron-left" onPress={() => navigation.goBack()} style={{right:10}} />
         
         <Appbar.Content
             style={{right:15}}
@@ -135,7 +141,7 @@ const ConfirmImageScreen = ({route,navigation,imageLocation,Climate}) => {
         />
 
         {
-            savedImageDate === newDate.toString() ?  
+            savedImageDate === date ?  
             <View style={{marginHorizontal:10,alignItems:"center",elevation:10,padding:10,backgroundColor:"pink",borderRadius:10}}>
                 <Text style={{textAlign: 'center',fontWeight:"bold",fontSize:18,padding:10,color:"white"}}>You have already clicked an image for the day</Text>
             </View>
