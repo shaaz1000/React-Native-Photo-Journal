@@ -3,11 +3,81 @@ import {Text,View,StyleSheet, StatusBar,FlatList, SafeAreaView, ImageBackground,
 import { Appbar } from 'react-native-paper';
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import Geolocation from 'react-native-geolocation-service';
-import Geocoder from 'react-native-geocoding';
+// import Geocoder from 'react-native-geocoding';
+import { useFocusEffect } from '@react-navigation/native';
 const ImageListScreen = () => {
     
+    const [isDataEmpty,setIsDataEmpty] = useState(false)
     
-    const [PermissionGranted,setisPermissionGranted] = useState(false)
+    
+    let Data1 = []
+    
+    //  Data1.push({
+    //     imageDate : "26th Jan 2021",
+    //     imageLocation : "Ahmednagar",
+    //     temperature :"24'☼",
+    //     imageLink : "https://media.nomadicmatt.com/netherlandsguide.jpg"
+    // })
+
+    
+    
+    const saveData = async () => {
+        
+        try {
+            const isDataAvailable = await AsyncStorage.getItem("savedData")
+            console.log(isDataAvailable,"is")
+            if(isDataAvailable === null){
+                setIsDataEmpty(true)
+                await AsyncStorage.setItem("savedData",JSON.stringify(Data1))
+            }
+            else{
+                getSavedData()
+            }
+            
+           
+        
+        } catch (error) {
+            console.log(error,"line 25")
+        }
+        
+    }
+    
+    const getSavedData = async () =>{
+        try {
+            const SavedData = await AsyncStorage.getItem("savedData")
+            const parseSavedData = JSON.parse(SavedData)
+            // console.log(parseSavedData.length,"len")
+            // if(parseSavedData.length == 0){
+            //     setIsDataEmpty(true)
+            // }
+            if(parseSavedData.length == 0){
+                setIsDataEmpty(true)
+            }
+            // else{
+           
+            // let newData = JSON.parse(SavedData)
+            
+            // newData.push({
+            //     imageDate : "28th Jan 2020",
+            //     imageLocation : "Ahmedae",
+            //     temperature :"25'☼",
+            //     imageLink : "uuuu"
+            // })
+            
+            
+            // //await AsyncStorage.removeItem("savedData")
+            // await AsyncStorage.setItem("savedData",JSON.stringify(newData))
+            // const data = await AsyncStorage.getItem("savedData")
+            // console.log(data,"d") 
+            // }
+        } catch (error) {
+            console.log(error,"line 41")
+        }
+        console.log("44")
+       
+    }
+    
+    
     const Data = [
         {
             imageDate : "26th Jan 2021",
@@ -71,17 +141,7 @@ const ImageListScreen = () => {
         },
     ]
 
-    const saveData = async () =>{
     
-        //console.log(data1,">>>>>><<<<<<<<",Data)
-        await AsyncStorage.setItem("savedData",JSON.stringify(Data))
-        
-        
-    }
-    const getSavedData = async () =>{
-        const SavedData = await AsyncStorage.getItem("savedData")
-       
-    }
 
     const askForLocationPermission = async () => {
         
@@ -95,12 +155,12 @@ const ImageListScreen = () => {
                 .then(({data})=>{
                     // const updatedData = data.toString()
                     const convertArraytoObject = Object.assign({},data)
-                    console.log(convertArraytoObject["0"].region_code,"hii")
+                    console.log(convertArraytoObject["0"].label,"hii")
                     fetch(`http://api.weatherapi.com/v1/current.json?key=231213c0d7704509a64210440210905&q=Thane,%20MH,%20India`)
                     .then(weatherResponse=>weatherResponse.json())
                     .then(({current})=>{
                         const {feelslike_c} = current
-                        console.log(feelslike_c,"from weather")
+                        //console.log(feelslike_c,"from weather")
                     })
                     .catch(err=>{
                         alert("Failed to load weather data")
@@ -132,7 +192,7 @@ const ImageListScreen = () => {
     
     useEffect(()=>{
         saveData()
-        getSavedData()
+        
         askForLocationPermission()
     
     },[Data])
@@ -171,6 +231,13 @@ const ImageListScreen = () => {
             }  titleStyle={{alignSelf:"center"}}/>
         </Appbar.Header>
         <SafeAreaView style={{flex:1}}>
+            {
+                isDataEmpty ?
+                <View style={{flex:1,justifyContent:"center",alignItems:"center"}}>
+                <Text style={{backgroundColor:"#a5e1ad",color:"#564a4a",padding:10,fontSize:18,fontWeight:"bold",borderRadius:10,marginHorizontal:15}}>You have no memories Please click on the plus button to start clicking image</Text>
+                </View>
+                :
+            
             <FlatList
                 data={Data}
                 renderItem={({item,index})=>{
@@ -181,6 +248,7 @@ const ImageListScreen = () => {
                    return index
                 }}
             />
+        }
         </SafeAreaView>
         </>
     )

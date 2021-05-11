@@ -9,6 +9,9 @@ import InfoScreen from "./source/screen/InfoScreen"
 import ImageInformationScreen from "./source/screen/ImageInformationScreen"
 import ViewImageScreen from "./source/screen/ViewImageScreen"
 import ConfirmImageScreen from "./source/screen/ConfirmImageScreen"
+import {Provider} from "react-redux"
+import store from "./source/redux/store"
+
 const Tab = createBottomTabNavigator()
 const Stack = createStackNavigator()
 
@@ -95,6 +98,7 @@ const bottomTabsScreen = () => {
 
 const App = () => {
   return(
+    <Provider store={store}>
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen name="Main" component={bottomTabsScreen} options={{headerShown:false}}/>
@@ -103,6 +107,7 @@ const App = () => {
         <Stack.Screen name="Confirm Image" component={ConfirmImageScreen} options={{headerShown:false}}/>
       </Stack.Navigator>
     </NavigationContainer>
+    </Provider>
   )
 }
 

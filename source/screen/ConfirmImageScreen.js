@@ -1,15 +1,47 @@
-import React from "react";
-import {Text,View,StyleSheet, StatusBar, SafeAreaView, ImageBackground,Dimensions,TouchableOpacity,Image} from "react-native"
+import React,{useState} from "react";
+import {Text,View,TextInput, StatusBar, SafeAreaView, ImageBackground,TouchableOpacity,Image,TouchableWithoutFeedback,Keyboard, KeyboardAvoidingView} from "react-native"
 import { Appbar ,IconButton} from 'react-native-paper';
 import moment from "moment"
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 const ConfirmImageScreen = ({route,navigation}) => {
-    //console.log(route,"aila")
+    const {params} = route
+    const [Thoughts,setThoughts] = useState("")
     const {image} = route.params
     const date = moment().format('D MMMM YYYY')
     
     const newDate = date.split(" ")
+    
+    const {path,mime,modificationDate} = params.image
    
+    const uploadData = () => {
+        let cloudData = {
+            uri : path,
+            type : mime,
+            name : modificationDate
+        }
+        const data = new FormData()
+        data.append("file",cloudData)
+        data.append('upload_preset',"SalesGrowAdmin")
+        data.append('cloud_name',"salesgrow")
+
+        fetch("https://api.cloudinary.com/v1_1/salesgrow/image/upload",{
+            method : "post",
+            body : data
+        }).then(res=>res.json())
+        .then(({url}) => {
+            console.log(url,"url")
+            // const data = []
+            // data.push({
+            //     imageDate : newDate,
+            //     imageLocation : "Ahmednagar",
+            //     temperature :"24'☼",
+            //     imageLink : url
+            // })
+        }
+        )
+        .catch(()=>Alert.alert("Something went wrong","please try again later"))
+    
+    }
     return(
         <>
         <StatusBar backgroundColor="white" barStyle="dark-content"/>
@@ -68,6 +100,33 @@ const ConfirmImageScreen = ({route,navigation}) => {
                 />
         </View>
         </TouchableOpacity>
+        
+        <TextInput
+            // onPressIn={()=>{
+            //     console.log("pressed")
+            // }}
+            // onTouchEnd={()=>{
+            //     setTouched(true)
+            // }}
+            onChangeText={(text)=>setThoughts(text)}
+            placeholder="Type your thoughts..."
+            placeholderTextColor="grey"
+            multiline={true}
+            style={{marginTop:30,fontSize:15,marginLeft:10,color:"grey"}}
+        />
+        {
+            Thoughts.length != 0
+            ?
+            <TouchableOpacity 
+                onPress={uploadData}
+                style={{alignSelf:"center",margin:10,backgroundColor:"#34ebcf",padding:10,borderRadius:10}}
+            >
+                <Text style={{color:"grey",fontWeight:"bold",fontSize:16}}>Upload Pic</Text>
+            </TouchableOpacity>
+            :
+            null
+         }
+        
         </SafeAreaView>
         </>
     )
